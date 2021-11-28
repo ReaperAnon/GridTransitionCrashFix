@@ -1,0 +1,8 @@
+{
+  "Nickname": "GridTransitionCrashFix",
+  "Visibility": "Visible",
+  "OneLineDescription": "Prevents crashing when quests might check the current location alias before it gets resolved.",
+  "LongDescription": "Sometimes location aliases can remain NULL and unresolved when getting checked. This patcher moves those checks to the end of quest alias condition lists so they have more time to be resolved and not cause a crash.",
+  "PreferredAutoVersioning": "Default",
+  "RequiredMods": []
+}
