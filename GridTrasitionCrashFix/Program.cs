@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mutagen.Bethesda;
-using Mutagen.Bethesda.Synthesis;
-using Mutagen.Bethesda.Skyrim;
 using System.Threading.Tasks;
+using Mutagen.Bethesda;
+using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Synthesis;
 
-namespace GridTrasitionCrashFix
+namespace GridTransitionCrashFix
 {
-    public class Program
+    public static class Program
     {
         public static async Task<int> Main(string[] args)
         {
@@ -18,15 +16,15 @@ namespace GridTrasitionCrashFix
                 .Run(args);
         }
 
-        public static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
+        private static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
         {
             foreach (var questGetter in state.LoadOrder.PriorityOrder.WinningOverrides<IQuestGetter>())
             {
-                bool wasChanged = false;
-                Quest questCopy = questGetter.DeepCopy();
+                var wasChanged = false;
+                var questCopy = questGetter.DeepCopy();
                 foreach (var questAlias in questCopy.Aliases)
                 {
-                    for (int i = questAlias.Conditions.Count - 1; i >= 0; --i)
+                    for (var i = questAlias.Conditions.Count - 1; i >= 0; --i)
                     {
                         var currCond = questAlias.Conditions[i];
                         if (currCond is ConditionFloat condFloat && condFloat.Data is FunctionConditionData condData && condData.Function == Condition.Function.GetInCurrentLocAlias)
@@ -34,7 +32,7 @@ namespace GridTrasitionCrashFix
                             if (condFloat.Flags.HasFlag(Condition.Flag.OR))
                             {
                                 // Find the last OR condition and move this one after it.
-                                int j = Math.Min(i + 1, questAlias.Conditions.Count);
+                                var j = Math.Min(i + 1, questAlias.Conditions.Count);
                                 while (j < questAlias.Conditions.Count && questAlias.Conditions[j].Flags.HasFlag(Condition.Flag.OR))
                                     ++j;
 
@@ -50,7 +48,7 @@ namespace GridTrasitionCrashFix
                                 if (i > 0 && questAlias.Conditions[i - 1].Flags.HasFlag(Condition.Flag.OR)) continue;
 
                                 // Find the last AND condition and move this one after it.
-                                int j = Math.Min(i + 1, questAlias.Conditions.Count);
+                                var j = Math.Min(i + 1, questAlias.Conditions.Count);
                                 while (j < questAlias.Conditions.Count && !questAlias.Conditions[j].Flags.HasFlag(Condition.Flag.OR))
                                     ++j;
 
@@ -58,7 +56,7 @@ namespace GridTrasitionCrashFix
                                 if (j <= i + 1)
                                 {
                                     // Check if after our AND condition we only have ORs.
-                                    int ORcount = 0;
+                                    var ORcount = 0;
                                     while (j < questAlias.Conditions.Count && questAlias.Conditions[j].Flags.HasFlag(Condition.Flag.OR))
                                     {
                                         ++j;
